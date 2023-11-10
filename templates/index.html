@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple and efficient URL shortener.">
+    <meta name="keywords" content="URL, shortener, link, short link">
+    <title>No BullSh!t Url Shortener</title>
+    <!-- CSS only -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": "WebApplication",
+            "name": "No Bullsh!t URL Shortener",
+            "description": "A simple, efficient, and free URL shortener with no ads or fees.",
+            "url": "http://shorturl.nobss.online"
+        }
+    </script>
+    <!-- Add canonical URL -->
+    <link rel="canonical" href="http://shorturl.nobss.online">
+
+     <style>
+        body {
+            background-color: #333; /* Dark background color */
+            color: #fff; /* Light text color */
+        }
+
+        .green-focus:focus {
+            border-color: #4CAF50; /* Green border color when focused */
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25); /* Green box shadow when focused */
+        }
+
+        .btn-primary {
+            background-color: #4CAF50; /* Green background color */
+            color: #fff; /* White text color */
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #45A245; /* Darker green on hover */
+        }
+
+        .btn-primary:focus {
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.5); /* Green box shadow when focused */
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5 text-center">No BullSh!t URL Shortener</h1>
+        <form id="url-form" class="mt-4" method="post" action="/shorten/">
+            <div class="form-group">
+                <label for="url-input">Enter URL:</label>
+                <input type="text" class="form-control" id="url-input" name="long_url" placeholder="Enter URL">
+            </div>
+            <div class="form-group">
+                <label for="custom-key-input">Custom Short URL Key (optional):</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">http://shorturl.nobss.online/</span>
+                    </div>
+                    <input type="text" class="form-control" id="custom-key-input" name="custom_key" placeholder="Enter custom key">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Shorten URL</button>
+        </form>
+        <div id="result" class="mt-4"></div>
+    </div>
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<script>
+document.getElementById('url-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var url = document.getElementById('url-input').value;
+    var customKey = document.getElementById('custom-key-input').value;
+    fetch('/shorten/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            long_url: url,
+            custom_key: customKey
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            if (response.status === 400) {
+                return response.json().then(data => {
+                    throw new Error(data.detail);
+                });
+            }
+            throw new Error('Invalid URL, please try again, be sure to include http:// or https://');
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('result').innerHTML = '<div class="alert alert-success" role="alert">Short URL: ' + data.short_url + '</div>';
+    })
+    .catch(error => {
+        document.getElementById('result').innerHTML = '<div class="alert alert-danger" role="alert">Error: ' + error.message + '</div>';
+    });
+});
+</script>
+</html>
